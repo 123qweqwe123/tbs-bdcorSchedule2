@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bdcor.pip.cp3UqsTodw.dao.PaperTableCreateDao">
+	
+	<resultMap type="com.bdcor.pip.cp3UqsTodw.domain.QuestionNaire" id="qnMap">
+		<result property="id" column="QUESTIONNAIRE_ID"/>
+		<result property="projectId" column="PROJECT_ID"/>
+        <collection property="sets" 
+                    select="getSets" 
+                    column="{projectId=PROJECT_ID,qnId=QUESTIONNAIRE_ID}"/>
+	</resultMap>
+	
+	<resultMap type="com.bdcor.pip.cp3UqsTodw.domain.QuestionSet" id="setMap">
+		<result property="id" column="QUESTIONSET_ID"/>
+		<result property="cycle" column="CYCLE"/>
+        <collection property="questions" 
+                    select="getQuestions" 
+                    column="{projectId=PROJECT_ID,qnId=QUESTIONNAIRE_ID,setId=QUESTIONSET_ID}"/>
+	</resultMap>
+	
+	<resultMap type="com.bdcor.pip.cp3UqsTodw.domain.Question" id="questionMap">
+        <result property="id" column="QUESTION_ID"/>
+        <result property="type" column="QUESTION_TYPE"/>
+        <result property="name" column="DISPLAY_NAME"/>
+        <collection property="options" 
+                    select="getQuestionOptions" 
+                    column="{projectId=PROJECT_ID,qnId=QUESTIONNAIRE_ID,setId=QUESTIONSET_ID,qId=QUESTION_ID}"/>
+	</resultMap>
+	
+	<select id="getQnList" resultMap="qnMap">
+		select decode(QUESTIONNAIRE_ID,'004002',replace(version,'.',''),QUESTIONNAIRE_ID) QUESTIONNAIRE_ID,PROJECT_ID,DISPLAY_NAME,
+DESCRIPTION,ORDER_IN_PROJECT,VERSION,CREATE_BY,CREATE_DATE,UPDATE_BY,UPDATE_DATE,IS_REMOVED,REMARK
+		from
+		(select qn.*,
+		row_number() over(partition by decode(QUESTIONNAIRE_ID,'004002',replace(version,'.',''),QUESTIONNAIRE_ID)
+    order by VERSION desc)rn
+		from PIP_UQS_QUESTIONNAIRE qn
+		)uqn where uqn.rn=1
+		order by QUESTIONNAIRE_ID
+	</select>
+	
+	<select id="getSets" resultMap="setMap">
+
+		select
+		distinct
+		s.PROJECT_ID,
+		decode(s.questionnaire_id,'004002',replace(s.version ,'.',''),s.questionnaire_id) questionnaire_id,
+		s.QUESTIONSET_ID,
+		case when a.ATTRIBUTE_ID is null then 0 else 1 end as cycle
+		from
+		PIP_UQS_QUESTIONSET s
+		left join PIP_UQS_ATTRIBUTE a
+		on
+		  decode(a.questionnaire_id,
+                '004002',
+                replace(a.version, '.', ''),
+                a.questionnaire_id)
+		  =
+          decode(s.questionnaire_id,
+                '004002',
+                replace(s.version, '.', ''),
+                s.questionnaire_id)
+		and a.QUESTIONSET_ID=s.QUESTIONSET_ID
+		and a.QUESTION_ID='0' and UPPER(a.type)='ISCYCLE' and a.VALUE='1'
+  		where s.PROJECT_ID=#{projectId}
+		and decode(s.questionnaire_id,'004002',replace(s.version ,'.',''),s.questionnaire_id)=#{qnId}
+		order by to_number(s.QUESTIONSET_ID)
+  	</select>
+  	
+  	<select id="getQuestions" resultMap="questionMap">
+  		select 
+  		distinct
+		q.PROJECT_ID,
+		decode( q.QUESTIONNAIRE_ID,'004002',replace(version,'.',''),q.QUESTIONNAIRE_ID ) QUESTIONNAIRE_ID,
+		q.QUESTIONSET_ID,q.QUESTION_ID,q.DISPLAY_NAME,upper(q.QUESTION_TYPE) as QUESTION_TYPE
+		from PIP_UQS_QUESTION q 
+		where q.PROJECT_ID=#{projectId}
+		and decode( q.QUESTIONNAIRE_ID,'004002',replace(version,'.',''),q.QUESTIONNAIRE_ID ) = #{qnId}
+		and q.QUESTIONSET_ID=#{setId}
+		order by to_number(q.QUESTIONSET_ID),to_number(q.QUESTION_ID)
+  	</select>
+  	
+  	<select id="getQuestionOptions" parameterType="map" resultType="com.bdcor.pip.cp3UqsTodw.domain.Option">
+  		select
+  		distinct
+		o.OPTION_ID as id,replace(o.OPTION_TYPE,'DATETIME','DATE') as type,o.OPTION_TYPE as realType,upper(o.OPTION_STYLE) as style,remark as tRemark
+		from PIP_UQS_OPTION o
+		where o.PROJECT_ID=#{projectId}
+		and decode(o.QUESTIONNAIRE_ID , '004002',replace(o.version,'.',''),o.QUESTIONNAIRE_ID) = #{qnId}
+		and o.QUESTIONSET_ID=#{setId} and o.QUESTION_ID=#{qId}
+		order by to_number(replace(o.OPTION_ID,'-','.'))
+  	</select>
+  	
+  	<update id="execUpdateSql" parameterType="string">
+  		${_parameter}
+  	</update>
+  	
+  	<insert id="execInsertSql" parameterType="string">
+  		${_parameter}
+  	</insert>
+  	
+  	<select id="checkHasInsert" resultType="int" parameterType="String">
+  		select count(*) from G${qnId} where PATIENT_ID=#{patientId}
+  	</select>
+  	
+  	<select id="getNewPIdList" parameterType="String" resultType="map" >
+  		select PATIENT_ID,UQS_VERSION from
+  		(
+			select PATIENT_ID,rownum r,
+
+            decode(
+            substr(replace(UQS_VERSION, '.', ''), 1, 6),
+            '004002',
+            substr(replace(UQS_VERSION, '.', ''), 1, 9),
+            substr(replace(UQS_VERSION, '.', ''), 1, 6)) UQS_VERSION
+
+            from PIP_UQS_ANSWERQN_LOG l
+			where STATE=1
+			and decode(
+				substr(replace(UQS_VERSION, '.', ''), 1, 6),
+				'004002',
+				substr(replace(UQS_VERSION, '.', ''), 1, 9),
+				substr(replace(UQS_VERSION, '.', ''), 1, 6)
+			)=#{qnId}
+			and l.PATIENT_ID
+				not in(select PATIENT_ID from G${qnId}_DATA@TO_122DW g where g.PATIENT_ID=l.PATIENT_ID)
+		)
+  	</select>
+  	
+  	<select id="getAnswerList" parameterType="string" resultType="com.bdcor.pip.cp3UqsTodw.domain.Answer">
+  		select 
+		'G'||
+		decode(
+			substr(replace(QUESTIONNAIRE_ID, '.', ''), 1, 6),
+			'004002',
+			substr(replace(QUESTIONNAIRE_ID, '.', ''), 1, 9),
+			substr(replace(QUESTIONNAIRE_ID, '.', ''), 1, 6)
+        )
+		||'_'||QUESTIONSET_ID||'_'||QUESTION_ID as id,OPTION_ID as optionId,ANSWER as text,QUESTIONNAIRE_ID as version
+		from PIP_UQS_ANSWER
+		where
+		decode(
+			substr(replace(QUESTIONNAIRE_ID, '.', ''), 1, 6),
+			'004002',
+			substr(replace(QUESTIONNAIRE_ID, '.', ''), 1, 9),
+			substr(replace(QUESTIONNAIRE_ID, '.', ''), 1, 6)
+        	) = #{qnId}
+        and PATIENT_ID=#{patientId}
+		order by  QUESTIONNAIRE_ID,to_number(QUESTIONSET_ID),length(QUESTION_ID),to_number(substr(QUESTION_ID,-3,3)),to_number(substr(QUESTION_ID,0,mod(length(QUESTION_ID),3)))
+  	</select>
+  	
+	
+	
+	<select id="test" resultType="string">
+
+		select instance_name from
+		<![CDATA[v$instance]]>
+	</select>
+	
+	<delete id="clearTable" parameterType="String">
+		delete from ${tableName}
+	</delete>
+
+	<update id="bakTable" parameterType="string">
+		create table ${target} as select * from ${src}
+	</update>
+
+	<select id="isTableExists" parameterType="string" resultType="Integer" >
+		select count(1) from user_tab_cols where table_name = upper(#{table_name})
+	</select>
+
+    <update id="reNameTable" parameterType="string">
+        alter table ${src} rename to ${target}
+    </update>
+
+    <update id="dropTable" parameterType="string">
+        drop table ${tablename}
+    </update>
+
+</mapper>

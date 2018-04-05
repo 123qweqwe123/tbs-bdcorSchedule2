@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bdcor.pip.uqsToDw.dao.UqsToDwDao">
+	<resultMap type="com.bdcor.pip.uqsToDw.domain.QuestionNaire" id="qnMap">
+		<result property="id" column="QUESTIONNAIRE_ID"/>
+		<result property="projectId" column="PROJECT_ID"/>
+        <collection property="sets" 
+                    select="getSets" 
+                    column="{projectId=PROJECT_ID,qnId=QUESTIONNAIRE_ID}"/>
+	</resultMap>
+	
+	<resultMap type="com.bdcor.pip.uqsToDw.domain.QuestionSet" id="setMap">
+		<result property="id" column="QUESTIONSET_ID"/>
+		<result property="cycle" column="CYCLE"/>
+        <collection property="questions" 
+                    select="getQuestions" 
+                    column="{projectId=PROJECT_ID,qnId=QUESTIONNAIRE_ID,setId=QUESTIONSET_ID}"/>
+	</resultMap>
+	
+	<resultMap type="com.bdcor.pip.uqsToDw.domain.Question" id="questionMap">
+        <result property="id" column="QUESTION_ID"/>
+        <result property="type" column="QUESTION_TYPE"/>
+        <result property="name" column="DISPLAY_NAME"/>
+        <collection property="options" 
+                    select="getQuestionOptions" 
+                    column="{projectId=PROJECT_ID,qnId=QUESTIONNAIRE_ID,setId=QUESTIONSET_ID,qId=QUESTION_ID}"/>
+	</resultMap>
+	
+	<select id="getQnList" resultMap="qnMap">
+		select *
+		from 
+		(select qn.*,
+		row_number() over(partition by QUESTIONNAIRE_ID order by VERSION desc)rn
+		from PIP_UQS_QUESTIONNAIRE qn)uqn where uqn.rn=1 
+		order by QUESTIONNAIRE_ID
+	</select>
+	
+	<select id="getSets" resultMap="setMap">
+		select  
+		distinct
+		s.PROJECT_ID,
+		s.QUESTIONNAIRE_ID,
+		s.QUESTIONSET_ID,
+		case when a.ATTRIBUTE_ID is null then 0 else 1 end as cycle
+		from 
+		PIP_UQS_QUESTIONSET s
+		left join PIP_UQS_ATTRIBUTE a on a.QUESTIONNAIRE_ID=s.QUESTIONNAIRE_ID and a.QUESTIONSET_ID=s.QUESTIONSET_ID 
+		                                  and a.QUESTION_ID='0' and UPPER(a.type)='ISCYCLE' and a.VALUE='1'
+		
+  		where s.PROJECT_ID=#{projectId} and s.QUESTIONNAIRE_ID=#{qnId}
+		order by s.QUESTIONNAIRE_ID,to_number(s.QUESTIONSET_ID)
+  	</select>
+  	
+  	<select id="getQuestions" resultMap="questionMap">
+  		select 
+  		distinct
+		q.PROJECT_ID,q.QUESTIONNAIRE_ID,q.QUESTIONSET_ID,q.QUESTION_ID,q.DISPLAY_NAME,upper(q.QUESTION_TYPE) as QUESTION_TYPE
+		from PIP_UQS_QUESTION q 
+		where q.PROJECT_ID=#{projectId} and q.QUESTIONNAIRE_ID=#{qnId} and q.QUESTIONSET_ID=#{setId}
+		order by q.QUESTIONNAIRE_ID,to_number(q.QUESTIONSET_ID),to_number(q.QUESTION_ID)
+  	</select>
+  	
+  	<select id="getQuestionOptions" parameterType="map" resultType="com.bdcor.pip.uqsToDw.domain.Option">
+  		select
+  		distinct
+  		
+		o.OPTION_ID as id,
+		(select count(*) from PIP_UQS_ATTRIBUTE a where a.VERSION=o.VERSION and a.QUESTIONSET_ID=o.QUESTIONSET_ID and a.QUESTION_ID=o.QUESTION_ID
+    	and a.OPTION_ID=o.OPTION_ID and UPPER(a.VALIDATEOBJECTTYPE)='NUMBER' and a.VALUE != '[10000000000,19999999999]') numArrCount,
+    	(select a.VALUE from PIP_UQS_ATTRIBUTE a where a.VERSION=o.VERSION and a.QUESTIONSET_ID=o.QUESTIONSET_ID and a.QUESTION_ID=o.QUESTION_ID
+    	and a.OPTION_ID=o.OPTION_ID and UPPER(a.VALIDATEOBJECTTYPE)='NUMBER' and UPPER(a.VALIDATETYPE)='FORMAT') format,
+		replace(o.OPTION_TYPE,'DATETIME','DATE') as type,o.OPTION_TYPE as realType,upper(o.OPTION_STYLE) as style,remark as tRemark
+		from PIP_UQS_OPTION o
+		where o.PROJECT_ID=#{projectId} and o.QUESTIONNAIRE_ID=#{qnId} and o.QUESTIONSET_ID=#{setId} and o.QUESTION_ID=#{qId}
+		order by to_number(replace(o.OPTION_ID,'-','.'))
+  	</select>
+  	
+  	<insert id="execInsertSql" parameterType="string">
+  		${_parameter}
+  	</insert>
+  	
+  	<select id="getPIdList" resultType="map" parameterType="String">
+		select info.PATIENT_ID,max(info.LCC_CODE) LCC_CODE,max(info.ITEM_CODE) ITEM_CODE
+	    from PIP_SCAN_UQS_INFO info
+	    left join G${qnId}_DATA@dwlink g on g.PATIENT_ID||g.RISK_CODE=info.PATIENT_ID
+	    where info.ITEM_CODE=#{qnId} and g.PROJECT_ID is null
+	    group by info.PATIENT_ID
+  	</select>
+  	
+  	<select id="getAnswerList" parameterType="string" resultType="com.bdcor.pip.uqsToDw.domain.Answer">
+  		select 
+		'G'||QUESTIONNAIRE_ID||'_'||QUESTIONSET_ID||'_'||QUESTION_ID as id,OPTION_ID as optionId,ANSWER as text,version
+		from PIP_UQS_ANSWER_${area}
+		where QUESTIONNAIRE_ID=#{qnId} and PATIENT_ID=#{patientId}
+		order by  QUESTIONNAIRE_ID,to_number(QUESTIONSET_ID),length(QUESTION_ID),to_number(substr(QUESTION_ID,-3,3)),to_number(substr(QUESTION_ID,0,mod(length(QUESTION_ID),3)))
+  	</select>
+  	
+</mapper>

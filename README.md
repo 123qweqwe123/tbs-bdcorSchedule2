@@ -1,1 +1,3 @@
-# tbs-bdcorSchedule2
+## 项目描述
+	高危、Peace3项目数据同步、迁移DW库
+	主要使用淘宝定时任务实现

@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bdcor.pip.data.dao.PipUqsHandleLog2014Mapper" >
+  <resultMap id="BaseResultMap" type="com.bdcor.pip.data.domain.PipUqsHandleLog2014" >
+    <result column="PROJECT_ID" property="projectId" jdbcType="VARCHAR" />
+    <result column="PATIENT_NAME" property="patientName" jdbcType="VARCHAR" />
+    <result column="UQSID" property="uqsid" jdbcType="VARCHAR" />
+    <result column="UQSName" property="uqsname" jdbcType="VARCHAR" />
+    <result column="UQSVersion" property="uqsversion" jdbcType="VARCHAR" />
+    <result column="VersionCreateDate" property="versioncreatedate" jdbcType="TIMESTAMP" />
+    <result column="QUESTION_START_DATE" property="questionStartDate" jdbcType="TIMESTAMP" />
+    <result column="QUESTION_END_DATE" property="questionEndDate" jdbcType="TIMESTAMP" />
+    <result column="uqsTimeZone" property="uqstimezone" jdbcType="VARCHAR" />
+    <result column="OperaterID" property="operaterid" jdbcType="VARCHAR" />
+    <result column="OperaterName" property="operatername" jdbcType="VARCHAR" />
+    <result column="HospitalCode" property="hospitalcode" jdbcType="VARCHAR" />
+    <result column="PATIENT_ID" property="patientId" jdbcType="VARCHAR" />
+    <result column="PersonID" property="personid" jdbcType="VARCHAR" />
+    <result column="PatientName" property="patientname" jdbcType="VARCHAR" />
+    <result column="PatientCode" property="patientcode" jdbcType="VARCHAR" />
+    <result column="UQSIsHold" property="uqsishold" jdbcType="VARCHAR" />
+    <result column="UQSRemark" property="uqsremark" jdbcType="VARCHAR" />
+    <result column="LCC_CODE" property="lccCode" jdbcType="VARCHAR" />
+    <result column="FTP_IP" property="ftpIp" jdbcType="VARCHAR" />
+    <result column="FTP_PORT" property="ftpPort" jdbcType="DECIMAL" />
+    <result column="FTP_PATH" property="ftpPath" jdbcType="VARCHAR" />
+    <result column="FTP_USER" property="ftpUser" jdbcType="VARCHAR" />
+    <result column="FILE_NAME" property="fileName" jdbcType="VARCHAR" />
+    <result column="CREATE_DATE" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_DATE" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="ZIPFILE_NAME" property="zipfileName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    PROJECT_ID, PATIENT_NAME, UQSID, UQSName, UQSVersion, VersionCreateDate, QUESTION_START_DATE, 
+    QUESTION_END_DATE, uqsTimeZone, OperaterID, OperaterName, HospitalCode, PATIENT_ID, 
+    PersonID, PatientName, PatientCode, UQSIsHold, UQSRemark, LCC_CODE, FTP_IP, FTP_PORT, 
+    FTP_PATH, FTP_USER, FILE_NAME, CREATE_DATE, UPDATE_DATE, ZIPFILE_NAME
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.bdcor.pip.data.domain.PipUqsHandleLog2014Example" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from PIP_UQS_HANDLE_LOG_2014_2 
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.bdcor.pip.data.domain.PipUqsHandleLog2014Example" >
+    delete from PIP_UQS_HANDLE_LOG_2014_2 
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.bdcor.pip.data.domain.PipUqsHandleLog2014" >
+    insert into PIP_UQS_HANDLE_LOG_2014_2  (PROJECT_ID, PATIENT_NAME, UQSID, 
+      UQSName, UQSVersion, VersionCreateDate, 
+      QUESTION_START_DATE, QUESTION_END_DATE, 
+      uqsTimeZone, OperaterID, OperaterName, 
+      HospitalCode, PATIENT_ID, PersonID, 
+      PatientName, PatientCode, UQSIsHold, 
+      UQSRemark, LCC_CODE, FTP_IP, 
+      FTP_PORT, FTP_PATH, FTP_USER, 
+      FILE_NAME, CREATE_DATE, UPDATE_DATE, 
+      ZIPFILE_NAME)
+    values (#{projectId,jdbcType=VARCHAR}, #{patientName,jdbcType=VARCHAR}, #{uqsid,jdbcType=VARCHAR}, 
+      #{uqsname,jdbcType=VARCHAR}, #{uqsversion,jdbcType=VARCHAR}, #{versioncreatedate,jdbcType=TIMESTAMP}, 
+      #{questionStartDate,jdbcType=TIMESTAMP}, #{questionEndDate,jdbcType=TIMESTAMP}, 
+      #{uqstimezone,jdbcType=VARCHAR}, #{operaterid,jdbcType=VARCHAR}, #{operatername,jdbcType=VARCHAR}, 
+      #{hospitalcode,jdbcType=VARCHAR}, #{patientId,jdbcType=VARCHAR}, #{personid,jdbcType=VARCHAR}, 
+      #{patientname,jdbcType=VARCHAR}, #{patientcode,jdbcType=VARCHAR}, #{uqsishold,jdbcType=VARCHAR}, 
+      #{uqsremark,jdbcType=VARCHAR}, #{lccCode,jdbcType=VARCHAR}, #{ftpIp,jdbcType=VARCHAR}, 
+      #{ftpPort,jdbcType=DECIMAL}, #{ftpPath,jdbcType=VARCHAR}, #{ftpUser,jdbcType=VARCHAR}, 
+      #{fileName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{zipfileName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bdcor.pip.data.domain.PipUqsHandleLog2014" >
+    insert into PIP_UQS_HANDLE_LOG_2014_2 
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        PROJECT_ID,
+      </if>
+      <if test="patientName != null" >
+        PATIENT_NAME,
+      </if>
+      <if test="uqsid != null" >
+        UQSID,
+      </if>
+      <if test="uqsname != null" >
+        UQSName,
+      </if>
+      <if test="uqsversion != null" >
+        UQSVersion,
+      </if>
+      <if test="versioncreatedate != null" >
+        VersionCreateDate,
+      </if>
+      <if test="questionStartDate != null" >
+        QUESTION_START_DATE,
+      </if>
+      <if test="questionEndDate != null" >
+        QUESTION_END_DATE,
+      </if>
+      <if test="uqstimezone != null" >
+        uqsTimeZone,
+      </if>
+      <if test="operaterid != null" >
+        OperaterID,
+      </if>
+      <if test="operatername != null" >
+        OperaterName,
+      </if>
+      <if test="hospitalcode != null" >
+        HospitalCode,
+      </if>
+      <if test="patientId != null" >
+        PATIENT_ID,
+      </if>
+      <if test="personid != null" >
+        PersonID,
+      </if>
+      <if test="patientname != null" >
+        PatientName,
+      </if>
+      <if test="patientcode != null" >
+        PatientCode,
+      </if>
+      <if test="uqsishold != null" >
+        UQSIsHold,
+      </if>
+      <if test="uqsremark != null" >
+        UQSRemark,
+      </if>
+      <if test="lccCode != null" >
+        LCC_CODE,
+      </if>
+      <if test="ftpIp != null" >
+        FTP_IP,
+      </if>
+      <if test="ftpPort != null" >
+        FTP_PORT,
+      </if>
+      <if test="ftpPath != null" >
+        FTP_PATH,
+      </if>
+      <if test="ftpUser != null" >
+        FTP_USER,
+      </if>
+      <if test="fileName != null" >
+        FILE_NAME,
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE,
+      </if>
+      <if test="updateDate != null" >
+        UPDATE_DATE,
+      </if>
+      <if test="zipfileName != null" >
+        ZIPFILE_NAME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="patientName != null" >
+        #{patientName,jdbcType=VARCHAR},
+      </if>
+      <if test="uqsid != null" >
+        #{uqsid,jdbcType=VARCHAR},
+      </if>
+      <if test="uqsname != null" >
+        #{uqsname,jdbcType=VARCHAR},
+      </if>
+      <if test="uqsversion != null" >
+        #{uqsversion,jdbcType=VARCHAR},
+      </if>
+      <if test="versioncreatedate != null" >
+        #{versioncreatedate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="questionStartDate != null" >
+        #{questionStartDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="questionEndDate != null" >
+        #{questionEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uqstimezone != null" >
+        #{uqstimezone,jdbcType=VARCHAR},
+      </if>
+      <if test="operaterid != null" >
+        #{operaterid,jdbcType=VARCHAR},
+      </if>
+      <if test="operatername != null" >
+        #{operatername,jdbcType=VARCHAR},
+      </if>
+      <if test="hospitalcode != null" >
+        #{hospitalcode,jdbcType=VARCHAR},
+      </if>
+      <if test="patientId != null" >
+        #{patientId,jdbcType=VARCHAR},
+      </if>
+      <if test="personid != null" >
+        #{personid,jdbcType=VARCHAR},
+      </if>
+      <if test="patientname != null" >
+        #{patientname,jdbcType=VARCHAR},
+      </if>
+      <if test="patientcode != null" >
+        #{patientcode,jdbcType=VARCHAR},
+      </if>
+      <if test="uqsishold != null" >
+        #{uqsishold,jdbcType=VARCHAR},
+      </if>
+      <if test="uqsremark != null" >
+        #{uqsremark,jdbcType=VARCHAR},
+      </if>
+      <if test="lccCode != null" >
+        #{lccCode,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpIp != null" >
+        #{ftpIp,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpPort != null" >
+        #{ftpPort,jdbcType=DECIMAL},
+      </if>
+      <if test="ftpPath != null" >
+        #{ftpPath,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpUser != null" >
+        #{ftpUser,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="zipfileName != null" >
+        #{zipfileName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.bdcor.pip.data.domain.PipUqsHandleLog2014Example" resultType="java.lang.Integer" >
+    select count(*) from PIP_UQS_HANDLE_LOG_2014_2 
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update PIP_UQS_HANDLE_LOG_2014_2 
+    <set >
+      <if test="record.projectId != null" >
+        PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.patientName != null" >
+        PATIENT_NAME = #{record.patientName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.uqsid != null" >
+        UQSID = #{record.uqsid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.uqsname != null" >
+        UQSName = #{record.uqsname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.uqsversion != null" >
+        UQSVersion = #{record.uqsversion,jdbcType=VARCHAR},
+      </if>
+      <if test="record.versioncreatedate != null" >
+        VersionCreateDate = #{record.versioncreatedate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.questionStartDate != null" >
+        QUESTION_START_DATE = #{record.questionStartDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.questionEndDate != null" >
+        QUESTION_END_DATE = #{record.questionEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.uqstimezone != null" >
+        uqsTimeZone = #{record.uqstimezone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.operaterid != null" >
+        OperaterID = #{record.operaterid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.operatername != null" >
+        OperaterName = #{record.operatername,jdbcType=VARCHAR},
+      </if>
+      <if test="record.hospitalcode != null" >
+        HospitalCode = #{record.hospitalcode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.patientId != null" >
+        PATIENT_ID = #{record.patientId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.personid != null" >
+        PersonID = #{record.personid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.patientname != null" >
+        PatientName = #{record.patientname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.patientcode != null" >
+        PatientCode = #{record.patientcode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.uqsishold != null" >
+        UQSIsHold = #{record.uqsishold,jdbcType=VARCHAR},
+      </if>
+      <if test="record.uqsremark != null" >
+        UQSRemark = #{record.uqsremark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.lccCode != null" >
+        LCC_CODE = #{record.lccCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ftpIp != null" >
+        FTP_IP = #{record.ftpIp,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ftpPort != null" >
+        FTP_PORT = #{record.ftpPort,jdbcType=DECIMAL},
+      </if>
+      <if test="record.ftpPath != null" >
+        FTP_PATH = #{record.ftpPath,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ftpUser != null" >
+        FTP_USER = #{record.ftpUser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fileName != null" >
+        FILE_NAME = #{record.fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createDate != null" >
+        CREATE_DATE = #{record.createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateDate != null" >
+        UPDATE_DATE = #{record.updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.zipfileName != null" >
+        ZIPFILE_NAME = #{record.zipfileName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update PIP_UQS_HANDLE_LOG_2014_2 
+    set PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      PATIENT_NAME = #{record.patientName,jdbcType=VARCHAR},
+      UQSID = #{record.uqsid,jdbcType=VARCHAR},
+      UQSName = #{record.uqsname,jdbcType=VARCHAR},
+      UQSVersion = #{record.uqsversion,jdbcType=VARCHAR},
+      VersionCreateDate = #{record.versioncreatedate,jdbcType=TIMESTAMP},
+      QUESTION_START_DATE = #{record.questionStartDate,jdbcType=TIMESTAMP},
+      QUESTION_END_DATE = #{record.questionEndDate,jdbcType=TIMESTAMP},
+      uqsTimeZone = #{record.uqstimezone,jdbcType=VARCHAR},
+      OperaterID = #{record.operaterid,jdbcType=VARCHAR},
+      OperaterName = #{record.operatername,jdbcType=VARCHAR},
+      HospitalCode = #{record.hospitalcode,jdbcType=VARCHAR},
+      PATIENT_ID = #{record.patientId,jdbcType=VARCHAR},
+      PersonID = #{record.personid,jdbcType=VARCHAR},
+      PatientName = #{record.patientname,jdbcType=VARCHAR},
+      PatientCode = #{record.patientcode,jdbcType=VARCHAR},
+      UQSIsHold = #{record.uqsishold,jdbcType=VARCHAR},
+      UQSRemark = #{record.uqsremark,jdbcType=VARCHAR},
+      LCC_CODE = #{record.lccCode,jdbcType=VARCHAR},
+      FTP_IP = #{record.ftpIp,jdbcType=VARCHAR},
+      FTP_PORT = #{record.ftpPort,jdbcType=DECIMAL},
+      FTP_PATH = #{record.ftpPath,jdbcType=VARCHAR},
+      FTP_USER = #{record.ftpUser,jdbcType=VARCHAR},
+      FILE_NAME = #{record.fileName,jdbcType=VARCHAR},
+      CREATE_DATE = #{record.createDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{record.updateDate,jdbcType=TIMESTAMP},
+      ZIPFILE_NAME = #{record.zipfileName,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+</mapper>

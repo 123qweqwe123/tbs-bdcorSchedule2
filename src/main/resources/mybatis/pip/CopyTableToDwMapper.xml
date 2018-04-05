@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bdcor.pip.copyTableToDw.dao.CopyTableToDwDao">
+	<select id="dataCount" parameterType="String" resultType="int">
+		select count(*) from ${tableName}
+	</select>
+
+  	<delete id="truncateTable" parameterType="String">
+  		truncate table ${tableName}
+  	</delete>
+  	
+  	<select id="getLccCodeList_All" resultType="String">
+  		select Lcc_code from PIP_COMM_LCC
+  	</select>
+  	
+  	<insert id="copyData" parameterType="String">
+  		insert into ${tableName} select * from ${tableName}@TO_MPP2 where LCC_CODE=#{lccCode}
+  	</insert>
+  	
+  	<insert id="copyTableRelation"  parameterType="String">
+  		insert into PIP_RELATION_006(PATIENT_ID,RISK_CODE,ID_NUMBER)
+		select PATIENT_ID,RISK_CODE,ID_NUMBER from PIP_COMM_PATIENT@TO_MPP2 where LCC_CODE=#{lccCode}
+  	</insert>
+</mapper>
